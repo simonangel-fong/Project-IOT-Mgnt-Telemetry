@@ -125,10 +125,10 @@ aws ecr get-login-password --region ca-central-1 | docker login --username AWS -
 docker build -t fastapi ./app/fastapi
 
 # tag your image
-docker tag fastapi:latest 099139718958.dkr.ecr.ca-central-1.amazonaws.com/iot-mgnt-telemetry-fastapi:latest
+docker tag fastapi:latest 099139718958.dkr.ecr.ca-central-1.amazonaws.com/iot-mgnt-telemetry-fastapi:dev
 
 # push image to repository
-docker push 099139718958.dkr.ecr.ca-central-1.amazonaws.com/iot-mgnt-telemetry-fastapi:latest
+docker push 099139718958.dkr.ecr.ca-central-1.amazonaws.com/iot-mgnt-telemetry-fastapi:dev
 
 # confirm
 aws ecr describe-images --repository-name iot-mgnt-telemetry-fastapi

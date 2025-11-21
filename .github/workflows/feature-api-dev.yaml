@@ -53,11 +53,11 @@ jobs:
         run: |
           echo ${{env.ECR_REPOSITORY}}:${{vars.ENV}}
 
-      # - name: FastAPI - Extract metadata
-      #   id: fastapi-meta
-      #   uses: docker/metadata-action@v5
-      #   with:
-      #     images: ${{ vars.FASTAPI_REPO }}
+      - name: FastAPI - Extract metadata
+        id: fastapi-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.ECR_REPOSITORY }}
 
       # - name: FastAPI - Build and push Docker image
       #   id: fastapi-push
