@@ -8,7 +8,7 @@ on:
     paths:
       - "app/**"
       - ".github/workflows/feature-api-dev.yaml"
-    
+
 permissions:
   id-token: write
   contents: read
@@ -16,7 +16,7 @@ permissions:
 jobs:
   ecr-push-fastapi:
     runs-on: ubuntu-latest
-
+    environment: dev
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
@@ -50,7 +50,9 @@ jobs:
             type=sha,format=long # Tag using the commit SHA
 
       - name: test
-        run: echo ${{env.ECR_REPOSITORY}}
+        run: |
+          echo ${{env.ECR_REPOSITORY}}:${{vars.ENV}}
+
       # - name: FastAPI - Extract metadata
       #   id: fastapi-meta
       #   uses: docker/metadata-action@v5
