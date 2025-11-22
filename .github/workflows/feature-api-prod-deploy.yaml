@@ -413,7 +413,6 @@ jobs:
           fi
 
       - name: Setup Terraform
-        if: env.TF_DEPLOY_FLAG == 'true'
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ vars.TF_VERSION }}

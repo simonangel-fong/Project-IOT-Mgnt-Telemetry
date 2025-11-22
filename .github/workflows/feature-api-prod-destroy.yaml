@@ -17,7 +17,7 @@ jobs:
     timeout-minutes: 90
     environment: prod
     env:
-      TF_DIR: aws/
+      TF_DIR: aws
       TF_PLUGIN_CACHE_DIR: /home/runner/.terraform.d/plugin-cache
       TF_VAR_aws_region: ${{ vars.AWS_REGION }}
       TF_VAR_env: ${{ vars.ENV }}
@@ -40,7 +40,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Terraform
-        if: env.TF_DEPLOY_FLAG == 'true'
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ vars.TF_VERSION }}
