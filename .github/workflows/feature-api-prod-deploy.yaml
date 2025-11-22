@@ -226,9 +226,9 @@ jobs:
       TF_PLUGIN_CACHE_DIR: /home/runner/.terraform.d/plugin-cache
       TF_VAR_aws_region: ${{ vars.AWS_REGION }}
       TF_VAR_env: ${{ vars.ENV }}
-      TF_VAR_aws_ecr_fastapi: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.PROJECT }}-${{vars.APP}}-fastapi:${{vars.ENV}}"
-      TF_VAR_aws_ecr_pgdb: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.PROJECT }}-${{vars.APP}}-pgdb:${{vars.ENV}}"
-      TF_VAR_aws_ecr_redis: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.PROJECT }}-${{vars.APP}}-redis:${{vars.ENV}}"
+      TF_VAR_aws_ecr_fastapi: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.PROJECT }}-${{vars.APP}}-fastapi"
+      TF_VAR_aws_ecr_pgdb: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.PROJECT }}-${{vars.APP}}-pgdb"
+      TF_VAR_aws_ecr_redis: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.PROJECT }}-${{vars.APP}}-redis"
       TF_VAR_app_pgdb_host: ${{ vars.APP_PGDB_HOST }}
       TF_VAR_app_pgdb_db: ${{ vars.APP_PGDB_DB }}
       TF_VAR_app_pgdb_user: ${{ vars.APP_PGDB_USER }}
