@@ -33,20 +33,20 @@ jobs:
           TF_INI_CONTENT=$(cat aws/terraform.ini | tr -d '\n' | tr '[:upper:]' '[:lower:]')
                    
           if [ "$TF_INI_CONTENT" == "deploy" ]; then
-            echo "::set-output name=tf_ini::true"
-            echo "Setting tf_ini to true (Deploy mode)."
+            echo "TF_DEPLOY_FLAG=true" >> "$GITHUB_OUTPUT"
+            echo "Setting TF_DEPLOY_FLAG to true (Deploy mode)."
           else
-            echo "::set-output name=tf_ini::false"
-            echo "Setting tf_ini to false (Destroy mode)."
+            echo "TF_DEPLOY_FLAG=false" >> "$GITHUB_OUTPUT"
+            echo "Setting TF_DEPLOY_FLAG to false (Destroy mode)."
           fi
     outputs:
-      tf_ini: ${{ steps.set_flag.outputs.tf_ini }}
+      TF_DEPLOY_FLAG: ${{ steps.set_flag.outputs.TF_DEPLOY_FLAG }}
 
   ecr-push-fastapi:
     name: Push Image to ECR - FastAPI(Prod)
     # condition: if ini is true
-    if: needs.set-tf-ini.outputs.tf_ini == 'true' 
     needs: set-tf-ini
+    if: needs.set-tf-ini.outputs.TF_DEPLOY_FLAG == 'true'
     runs-on: ubuntu-latest
     environment: prod
     env:
