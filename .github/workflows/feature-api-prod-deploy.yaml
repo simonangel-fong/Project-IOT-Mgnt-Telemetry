@@ -35,7 +35,9 @@ jobs:
           if [ "$TF_INI_CONTENT" == "deploy" ]; then
             echo "TF_DEPLOY_FLAG=true" >> "$GITHUB_OUTPUT"
             echo "Setting TF_DEPLOY_FLAG to true (Deploy mode)."
-          else
+          fi
+
+          if [ "$TF_INI_CONTENT" == "destroy" ]; then
             echo "TF_DEPLOY_FLAG=false" >> "$GITHUB_OUTPUT"
             echo "Setting TF_DEPLOY_FLAG to false (Destroy mode)."
           fi
