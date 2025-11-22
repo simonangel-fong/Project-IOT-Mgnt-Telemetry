@@ -11,8 +11,8 @@ env:
   TF_DEPLOY_FLAG: false
 
 jobs:
-  deploy:
-    name: Deploy(Prod)
+  destroy:
+    name: Destroy(Prod)
     runs-on: ubuntu-latest
     timeout-minutes: 90
     environment: prod
