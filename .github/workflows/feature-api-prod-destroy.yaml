@@ -7,6 +7,9 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  TF_DEPLOY_FLAG: false
+
 jobs:
   deploy:
     name: Deploy(Prod)
@@ -31,7 +34,7 @@ jobs:
       TF_VAR_app_pgdb_init_pwd: ${{ secrets.APP_PGDB_INIT_PWD }}
       TF_VAR_cloudflare_api_token: ${{ secrets.CF_API_TOKEN }}
       TF_VAR_cloudflare_zone_id: ${{ secrets.CF_ZONE_ID }}
-      TF_DEPLOY_FLAG: false
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
