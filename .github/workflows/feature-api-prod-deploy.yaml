@@ -253,14 +253,14 @@ jobs:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
           key: ${{ runner.os }}-terraform-${{ vars.TF_VERSION }}
 
-  #     - name: Terraform init - S3 backend
-  #       working-directory: ${{ env.TF_DIR }}
-  #       run: |
-  #         terraform init -reconfigure -input=false \
-  #           -backend-config="bucket=${{ vars.AWS_BACKEND_BUCKET }}" \
-  #           -backend-config="region=${{ vars.AWS_REGION }}" \
-  #           -backend-config="key=${{ vars.PROJECT }}/${{vars.APP}}/${{ vars.ENV }}/terraform.tfstate" \
-  #           -backend-config="encrypt=true"
+      - name: Terraform init - S3 backend
+        working-directory: ${{ env.TF_DIR }}
+        run: |
+          terraform init -reconfigure -input=false \
+            -backend-config="bucket=${{ vars.AWS_BACKEND_BUCKET }}" \
+            -backend-config="region=${{ vars.AWS_REGION }}" \
+            -backend-config="key=${{ vars.PROJECT }}-${{vars.APP}}/${{ vars.ENV }}/terraform.tfstate" \
+            -backend-config="encrypt=true"
 
   #     - name: Terraform Validate
   #       working-directory: ${{ env.TF_DIR }}
