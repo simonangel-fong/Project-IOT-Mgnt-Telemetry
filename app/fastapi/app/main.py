@@ -11,7 +11,7 @@ from .config.logging import setup_logging
 setup_logging()
 
 HOSTNAME = os.getenv("HOSTNAME", "my_host")
-
+API_PREFIX = "/api"
 settings = get_settings()
 
 app = FastAPI(
@@ -30,7 +30,7 @@ app = FastAPI(
 # Root endpoint
 # ============================================================
 @app.get(
-    "/",
+    f"{API_PREFIX}/",
     tags=["root"],
     summary="Service status",
     description=(
@@ -57,7 +57,7 @@ async def home() -> dict:
         response["fastapi"] = {
             "fastapi_host": HOSTNAME,
         }
-        
+
         pgdb_cfg = settings.postgres
         response["postgres"] = {
             "host": pgdb_cfg.host,
@@ -78,12 +78,11 @@ async def home() -> dict:
 # ============================================================
 # Routers
 # ============================================================
-# Health check / liveness & readiness probes
-app.include_router(health.router)
+# Health check & readiness probes
+app.include_router(health.router, prefix=API_PREFIX)
 
 # Administrative device registry endpoints (UUID-based lookups)
-app.include_router(device.router)
+app.include_router(device.router, prefix=API_PREFIX)
 
 # Device-facing telemetry ingestion and listing endpoints
-app.include_router(telemetry.router)
-
+app.include_router(telemetry.router, prefix=API_PREFIX)

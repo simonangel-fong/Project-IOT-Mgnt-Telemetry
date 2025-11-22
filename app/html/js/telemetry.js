@@ -29,7 +29,7 @@ function populateDeviceSelect() {
   if (!deviceSelect) return;
   DEVICES.forEach((d) => {
     const opt = document.createElement("option");
-    opt.value = d.alias;      // we'll use alias as the selected value
+    opt.value = d.alias; // we'll use alias as the selected value
     opt.textContent = d.alias;
     deviceSelect.appendChild(opt);
   });
@@ -44,7 +44,7 @@ function mapToBox(x, y) {
   const width = rect.width;
   const height = rect.height;
 
-  const nx = (x + 100) / 200;  // -100..100 -> 0..1
+  const nx = (x + 100) / 200; // -100..100 -> 0..1
   const ny = (y + 100) / 200;
 
   const left = nx * width;
@@ -99,6 +99,7 @@ async function fetchTelemetry(device) {
       Accept: "application/json",
     },
   });
+  console.log("fdfsfd");
 
   if (!res.ok) {
     console.error("Telemetry fetch failed", res.status, await res.text());
@@ -158,12 +159,7 @@ async function refreshTelemetry() {
     const result = await fetchTelemetry(currentDevice);
     if (!result) return;
 
-    updateDevicePosition(
-      result.alias,
-      result.x,
-      result.y,
-      result.deviceTime
-    );
+    updateDevicePosition(result.alias, result.x, result.y, result.deviceTime);
   } catch (err) {
     console.error("Error refreshing telemetry:", err);
     // You could update a "status" element here if you add one
