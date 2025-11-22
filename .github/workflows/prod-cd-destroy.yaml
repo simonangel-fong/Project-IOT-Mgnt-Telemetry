@@ -1,18 +1,27 @@
-name: Manual Destroy(Prod)
+name: Manually Destroy(Prod)
 
 on:
   workflow_dispatch:
+    # require input
+    inputs:
+      confirm_destroy:
+        description: "Type YES to confirm destroying PROD infrastructure"
+        required: true
+        type: string
+
+concurrency:
+  group: prod-destroy-${{ github.ref_name }}
+  cancel-in-progress: false # keep in-progress jobs
 
 permissions:
   id-token: write
   contents: read
 
-env:
-  TF_DEPLOY_FLAG: false
-
 jobs:
   destroy:
     name: Destroy(Prod)
+    # destroy only if yes
+    if: github.event.inputs.confirm_destroy == 'YES'  
     runs-on: ubuntu-latest
     timeout-minutes: 90
     environment: prod
@@ -89,7 +98,7 @@ jobs:
       - name: Save plan artifacts - Destroy
         uses: actions/upload-artifact@v4
         with:
-          name: tfplan-bundle
+          name: tfplan-bundle-destroy-manual
           path: |
             ${{ env.TF_DIR }}/tfplan-destroy
             ${{ env.TF_DIR }}/tfplan-destroy.json

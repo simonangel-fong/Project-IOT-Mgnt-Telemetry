@@ -9,10 +9,10 @@ on:
       - "app/fastapi/**"
       - "app/pgdb/**"
       - "aws/**"
-      - ".github/workflows/feature-api-prod-apply.yaml"
+      - ".github/workflows/prod-cd-apply.yaml"
 
 concurrency:
-  group: prod-${{ github.ref_name }}
+  group: prod-apply-${{ github.ref_name }}
   cancel-in-progress: false # keep in-progress jobs
 
 permissions:
@@ -33,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          TF_INI_CONTENT=$(cat aws/terraform.ini | tr -d '\n' | tr '[:upper:]' '[:lower:]')
+          TF_INI_CONTENT=$(tr -d '\n' < aws/terraform.ini | tr '[:upper:]' '[:lower:]')
                    
           if [ "$TF_INI_CONTENT" == "deploy" ]; then
             echo "TF_DEPLOY_FLAG=true" >> "$GITHUB_OUTPUT"
@@ -69,7 +69,7 @@ jobs:
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-      DIR_DOCKFILE: ${{ matrix.service.docker_context }}  # dockfile path
+      DIR_DOCKFILE: ${{ matrix.service.docker_context }} # dockfile path
       ECR_REPOSITORY: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.PROJECT }}-${{ vars.APP }}-${{ matrix.service.name }}"
 
     steps:
@@ -131,223 +131,12 @@ jobs:
             <p><b>Commit</b>: ${{ github.sha }}</p>
             <p><a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Workflow Run</a></p>
 
-  # ecr-push-fastapi:
-  #   name: Push Image to ECR - FastAPI(Prod)
-  #   # condition: if ini is true
-  #   needs: set-tf-ini
-  #   if: needs.set-tf-ini.outputs.TF_DEPLOY_FLAG == 'true'
-  #   runs-on: ubuntu-latest
-  #   environment: prod
-  #   env:
-  #     AWS_REGION: ${{ vars.AWS_REGION }}
-  #     AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  #     DIR_DOCKFILE: app/fastapi
-  #     ECR_REPOSITORY: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.PROJECT }}-${{vars.APP}}-fastapi"
-
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Configure AWS credentials (OIDC)
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         role-to-assume: ${{ secrets.AWS_TF_ROLE_ARN}}
-  #         aws-region: ${{ vars.AWS_REGION }}
-
-  #     - name: Login to Amazon ECR
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v2
-
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
-
-  #     - name: FastAPI - Extract metadata
-  #       id: fastapi-meta
-  #       uses: docker/metadata-action@v5
-  #       with:
-  #         images: ${{ env.ECR_REPOSITORY }}
-
-  #     - name: FastAPI - Build and push Docker image
-  #       id: fastapi-push
-  #       uses: docker/build-push-action@v3
-  #       with:
-  #         push: true
-  #         context: ${{ env.DIR_DOCKFILE }}
-  #         labels: ${{ steps.fastapi-meta.outputs.labels }}
-  #         tags: "${{ env.ECR_REPOSITORY }}:${{ vars.ENV }}"
-
-  #     - name: Send email notification
-  #       uses: dawidd6/action-send-mail@v3
-  #       if: failure()
-  #       with:
-  #         server_address: smtp.gmail.com
-  #         server_port: 465
-  #         secure: true
-  #         username: ${{ secrets.EMAIL_USERNAME }}
-  #         password: ${{ secrets.EMAIL_PASSWORD }}
-  #         subject: "${{ job.status }} - ${{ github.workflow }}: ${{ vars.PROJECT}} ${{vars.APP}} (${{vars.ENV}})"
-  #         to: ${{ secrets.EMAIL_USERNAME }}
-  #         from: ${{ secrets.EMAIL_USERNAME }}
-  #         html_body: |
-  #           <h2>GitHub Actions CI/CD Notification</h2>
-  #           <p><b>Project</b>: ${{ vars.PROJECT}}</p>
-  #           <p><b>Application</b>: ${{ vars.APP}}</p>
-  #           <p><b>Repository</b>: ${{ github.repository }}</p>
-  #           <p><b>Env</b>: ${{ vars.ENV }}</p>
-  #           <p><b>Job</b>: ${{ github.job }}</p>
-  #           <p><b>Status</b>: ${{ job.status }}</p>
-  #           <p><b>Branch</b>: ${{ github.ref }}</p>
-  #           <p><b>Workflow</b>: ${{ github.workflow }}</p>
-  #           <p><b>Commit</b>: ${{ github.sha }}</p>
-  #           <p><a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Workflow Run</a></p>
-
-  # ecr-push-pgdb:
-  #   name: Push Image to ECR - Postgres(Prod)
-  #   needs: set-tf-ini
-  #   if: needs.set-tf-ini.outputs.TF_DEPLOY_FLAG == 'true'
-  #   runs-on: ubuntu-latest
-  #   environment: prod
-  #   env:
-  #     AWS_REGION: ${{ vars.AWS_REGION }}
-  #     AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  #     DIR_DOCKFILE: app/pgdb
-  #     ECR_REPOSITORY: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.PROJECT }}-${{vars.APP}}-pgdb"
-
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Configure AWS credentials (OIDC)
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         role-to-assume: ${{ secrets.AWS_TF_ROLE_ARN}}
-  #         aws-region: ${{ vars.AWS_REGION }}
-
-  #     - name: Login to Amazon ECR
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v2
-
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
-
-  #     - name: Postgres - Extract metadata
-  #       id: postgres-meta
-  #       uses: docker/metadata-action@v5
-  #       with:
-  #         images: ${{ env.ECR_REPOSITORY }}
-
-  #     - name: Postgres - Build and push Docker image
-  #       id: postgres-push
-  #       uses: docker/build-push-action@v3
-  #       with:
-  #         push: true
-  #         context: ${{ env.DIR_DOCKFILE }}
-  #         labels: ${{ steps.postgres-meta.outputs.labels }}
-  #         tags: |
-  #           ${{ env.ECR_REPOSITORY }}:${{ vars.ENV }}
-  #           ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-
-  #     - name: Send email notification
-  #       if: failure()
-  #       uses: dawidd6/action-send-mail@v3
-  #       with:
-  #         server_address: smtp.gmail.com
-  #         server_port: 465
-  #         secure: true
-  #         username: ${{ secrets.EMAIL_USERNAME }}
-  #         password: ${{ secrets.EMAIL_PASSWORD }}
-  #         subject: "${{ job.status }} - ${{ github.workflow }}: ${{ vars.PROJECT}} ${{vars.APP}} (${{vars.ENV}})"
-  #         to: ${{ secrets.EMAIL_USERNAME }}
-  #         from: ${{ secrets.EMAIL_USERNAME }}
-  #         html_body: |
-  #           <h2>GitHub Actions CI/CD Notification</h2>
-  #           <p><b>Project</b>: ${{ vars.PROJECT}}</p>
-  #           <p><b>Application</b>: ${{ vars.APP}}</p>
-  #           <p><b>Repository</b>: ${{ github.repository }}</p>
-  #           <p><b>Env</b>: ${{ vars.ENV }}</p>
-  #           <p><b>Job</b>: ${{ github.job }}</p>
-  #           <p><b>Status</b>: ${{ job.status }}</p>
-  #           <p><b>Branch</b>: ${{ github.ref }}</p>
-  #           <p><b>Workflow</b>: ${{ github.workflow }}</p>
-  #           <p><b>Commit</b>: ${{ github.sha }}</p>
-  #           <p><a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Workflow Run</a></p>
-
-  # ecr-push-redis:
-  #   name: Push Image to ECR - Redis(Prod)
-  #   needs: set-tf-ini
-  #   if: needs.set-tf-ini.outputs.TF_DEPLOY_FLAG == 'true'
-  #   runs-on: ubuntu-latest
-  #   environment: prod
-  #   env:
-  #     AWS_REGION: ${{ vars.AWS_REGION }}
-  #     AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  #     DIR_DOCKFILE: app/redis
-  #     ECR_REPOSITORY: "${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/${{ vars.PROJECT }}-${{vars.APP}}-redis"
-
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Configure AWS credentials (OIDC)
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         role-to-assume: ${{ secrets.AWS_TF_ROLE_ARN}}
-  #         aws-region: ${{ vars.AWS_REGION }}
-
-  #     - name: Login to Amazon ECR
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v2
-
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
-
-  #     - name: Redis - Extract metadata
-  #       id: redis-meta
-  #       uses: docker/metadata-action@v5
-  #       with:
-  #         images: ${{ env.ECR_REPOSITORY }}
-
-  #     - name: Redis - Build and push Docker image
-  #       id: redis-push
-  #       uses: docker/build-push-action@v3
-  #       with:
-  #         push: true
-  #         context: ${{ env.DIR_DOCKFILE }}
-  #         labels: ${{ steps.redis-meta.outputs.labels }}
-  #         tags: "${{ env.ECR_REPOSITORY }}:${{ vars.ENV }}"
-
-  #     - name: Send email notification
-  #       if: failure()
-  #       uses: dawidd6/action-send-mail@v3
-  #       with:
-  #         server_address: smtp.gmail.com
-  #         server_port: 465
-  #         secure: true
-  #         username: ${{ secrets.EMAIL_USERNAME }}
-  #         password: ${{ secrets.EMAIL_PASSWORD }}
-  #         subject: "${{ job.status }} - ${{ github.workflow }}: ${{ vars.PROJECT}} ${{vars.APP}} (${{vars.ENV}})"
-  #         to: ${{ secrets.EMAIL_USERNAME }}
-  #         from: ${{ secrets.EMAIL_USERNAME }}
-  #         html_body: |
-  #           <h2>GitHub Actions CI/CD Notification</h2>
-  #           <p><b>Project</b>: ${{ vars.PROJECT}}</p>
-  #           <p><b>Application</b>: ${{ vars.APP}}</p>
-  #           <p><b>Repository</b>: ${{ github.repository }}</p>
-  #           <p><b>Env</b>: ${{ vars.ENV }}</p>
-  #           <p><b>Job</b>: ${{ github.job }}</p>
-  #           <p><b>Status</b>: ${{ job.status }}</p>
-  #           <p><b>Branch</b>: ${{ github.ref }}</p>
-  #           <p><b>Workflow</b>: ${{ github.workflow }}</p>
-  #           <p><b>Commit</b>: ${{ github.sha }}</p>
-  #           <p><a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Workflow Run</a></p>
-
   deploy:
     name: Deploy(Prod)
     needs:
       - ecr-push
-      # - ecr-push-fastapi
-      # - ecr-push-pgdb
-      # - ecr-push-redis
+      - set-tf-ini
+    if: needs.set-tf-ini.outputs.TF_DEPLOY_FLAG == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: prod
@@ -393,7 +182,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-          key: ${{ runner.os }}-terraform-${{ vars.TF_VERSION }}
+          key: ${{ runner.os }}-terraform-${{ vars.TF_VERSION }}-${{ hashFiles('aws/.terraform.lock.hcl') }}
 
       - name: Terraform init - S3 backend
         working-directory: ${{ env.TF_DIR }}
@@ -422,7 +211,7 @@ jobs:
       - name: Deploy - Save plan artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: tfplan-bundle
+          name: tfplan-bundle-deploy
           path: |
             ${{ env.TF_DIR }}/tfplan
             ${{ env.TF_DIR }}/tfplan.json
@@ -507,7 +296,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
-          key: ${{ runner.os }}-terraform-${{ vars.TF_VERSION }}
+          key: ${{ runner.os }}-terraform-${{ vars.TF_VERSION }}-${{ hashFiles('aws/.terraform.lock.hcl') }}
 
       - name: Terraform init - S3 backend
         working-directory: ${{ env.TF_DIR }}
@@ -536,7 +325,7 @@ jobs:
       - name: Destroy - Save plan artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: tfplan-bundle
+          name: tfplan-bundle-destroy
           path: |
             ${{ env.TF_DIR }}/tfplan-destroy
             ${{ env.TF_DIR }}/tfplan-destroy.json
