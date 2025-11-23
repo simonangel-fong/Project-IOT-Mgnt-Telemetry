@@ -23,14 +23,14 @@ resource "aws_cloudfront_distribution" "ecs_cdn" {
 
   # S3 static website origin
   origin {
-    origin_id   = local.aws_cf_origin_web
+    origin_id = local.aws_cf_origin_web
 
     domain_name = aws_s3_bucket_website_configuration.website_config.website_endpoint
 
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "http-only"   # S3 website is HTTP-only
+      origin_protocol_policy = "http-only" # S3 website is HTTP-only
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
@@ -43,7 +43,7 @@ resource "aws_cloudfront_distribution" "ecs_cdn" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "http-only"   # or "https-only" if your ALB listens on 443
+      origin_protocol_policy = "http-only" # or "https-only" if your ALB listens on 443
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
@@ -53,9 +53,9 @@ resource "aws_cloudfront_distribution" "ecs_cdn" {
     target_origin_id       = local.aws_cf_origin_web
     viewer_protocol_policy = "redirect-to-https"
 
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    compress         = true
+    allowed_methods = ["GET", "HEAD", "OPTIONS"]
+    cached_methods  = ["GET", "HEAD", "OPTIONS"]
+    compress        = true
 
     forwarded_values {
       query_string = false
@@ -72,9 +72,9 @@ resource "aws_cloudfront_distribution" "ecs_cdn" {
     viewer_protocol_policy = "redirect-to-https"
 
     # API can use all methods
-    allowed_methods  = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-    cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    compress         = true
+    allowed_methods = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods  = ["GET", "HEAD", "OPTIONS"]
+    compress        = true
 
     # API usually should NOT be cached (or only very short TTLs)
     min_ttl     = 0
@@ -98,10 +98,10 @@ resource "aws_cloudfront_distribution" "ecs_cdn" {
     }
   }
 
-  enabled              = true
-  aliases              = [local.dns_name]        # iot-dev.arguswatcher.net
-  price_class          = "PriceClass_100"
-  default_root_object  = "index.html"
+  enabled             = true
+  aliases             = [local.dns_name] # iot-dev.arguswatcher.net
+  price_class         = "PriceClass_100"
+  default_root_object = "index.html"
 
   viewer_certificate {
     acm_certificate_arn      = data.aws_acm_certificate.cf_certificate.arn
