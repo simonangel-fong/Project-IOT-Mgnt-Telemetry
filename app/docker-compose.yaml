@@ -61,13 +61,15 @@ services:
 
   fastapi01:
     container_name: fastapi01
-    image: 099139718958.dkr.ecr.ca-central-1.amazonaws.com/iot-mgnt-telemetry-fastapi:dev
+    # image: 099139718958.dkr.ecr.ca-central-1.amazonaws.com/iot-mgnt-telemetry-fastapi:dev
     # image: simonangelfong/demo-ecs-svc-fastapi
     # image: fastapi
-    # build:
-      # context: ./fastapi/
-      # dockerfile: Dockerfile
+    build:
+      context: ./fastapi/
+      dockerfile: Dockerfile
     environment:
+      - APP_NAME=fdsfafdsa
+      - CORS="http://localhost,http://localhost:8080,https://localhost"
       - ENV=dev
       - DEBUG=true
       - POSTGRES__HOST=postgres
@@ -111,3 +113,14 @@ services:
       # - fastapi02
       # - fastapi03
       # - fastapi04
+
+  device_simulator:
+    container_name: device_simulator
+    build:
+      context: ./device/
+      dockerfile: Dockerfile
+    environment:
+      - INTERVAL=1
+      - REMOTE=nginx:8080
+    networks:
+      - public_network
