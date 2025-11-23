@@ -69,6 +69,8 @@ jobs:
             docker_context: app/pgdb
           - name: redis
             docker_context: app/redis
+          - name: device
+            docker_context: app/device
 
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
