@@ -9,9 +9,9 @@ on:
         required: true
         type: string
 
-  schedule:
-    # 17:00 toronto time
-    - cron: "0 22 * * *"  
+  # schedule:
+  #   # 17:00 toronto time
+  #   - cron: "0 22 * * *"  
 
 concurrency:
   group: prod-destroy-${{ github.ref_name }}

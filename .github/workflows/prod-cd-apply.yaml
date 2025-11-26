@@ -11,9 +11,9 @@ on:
       - "aws/**"
       - ".github/workflows/prod-cd-apply.yaml"
 
-  schedule:
-    # 9:00 toronto time
-    - cron: "0 14 * * *"
+  # schedule:
+  #   # 9:00 toronto time
+  #   - cron: "0 14 * * *"
 
 concurrency:
   group: prod-apply-${{ github.ref_name }}
